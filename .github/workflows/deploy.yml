@@ -1,0 +1,50 @@
+name: Deploy containers to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli
+      
+    - name: Configure AWS credentials
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
+
+    - name: Build and push Docker images to ECR
+      run: |
+        $(aws ecr get-login --no-include-email)
+        docker build -t 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend backend/
+        docker build -t 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-frontend frontend/
+        docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend
+        docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-frontend
+
+    - name: SSH into EC2 and deploy
+      run: |
+        ssh -i ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem ec2-user@18.132.120.16 << EOF
+          
+          # Backend deployment commands
+          cd /path/to/backend
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d
+
+          # Frontend deployment commands
+          cd /path/to/frontend
+          docker-compose down
+          docker-compose pull
+          docker-compose up -d
+        EOF
