@@ -15,8 +15,7 @@ jobs:
       
     - name: Install AWS CLI
       run: |
-        sudo apt-get update
-        sudo apt-get install -y awscli
+        sudo yum install -y aws-cli
       
     - name: Configure AWS credentials
       run: |
