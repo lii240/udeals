@@ -1,0 +1,7 @@
+umrahdeals-kp.pem
+/server/venv/
+/client/node_modules/
+/client/.next/
+/client/.env
+/client/.env.local
+/client/public/build/

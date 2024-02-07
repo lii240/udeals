@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  umrahdeals-frontend:
+    build: ./client
+    ports:
+      - "3000:3000"
+    restart: always
+
+  umrahdeals-backend:
+    build: ./server
+    ports:
+      - "5001:5001"
+    restart: always
