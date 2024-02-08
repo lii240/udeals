@@ -13,11 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       
-    - name: Install AWS CLI
-      run: |
-        sudo yum install -y python3-pip
-        sudo pip3 install awscli --upgrade
-      
     - name: Configure AWS credentials
       run: |
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -34,7 +29,7 @@ jobs:
 
     - name: SSH into EC2 and deploy
       run: |
-        ssh -i ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem ec2-user@18.132.120.16 << EOF
+        ssh -i ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem ec2-user@3.8.184.137 << EOF
           
           # Backend deployment commands
           cd /path/to/backend
