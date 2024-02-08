@@ -28,8 +28,6 @@ jobs:
         port: 22
         source: "backend/*"
         target: "/umrahdeals/server/backend/"
-        recursive: true  # Transfers files recursively
-        verbose: true   # Shows transfer progress
 
     - name: Transfer frontend code to EC2
       uses: appleboy/scp-action@master
@@ -40,8 +38,6 @@ jobs:
         port: 22
         source: "frontend/*"
         target: "/umrahdeals/client/frontend/"
-        recursive: true  # Transfers files recursively
-        verbose: true   # Shows transfer progress
 
     - name: Login to Amazon ECR
       id: login-ecr
