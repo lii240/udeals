@@ -19,25 +19,16 @@ jobs:
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
 
-    - name: Transfer backend code to EC2
-      uses: appleboy/scp-action@master
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3
       with:
-        host: ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
-        username: ec2-user
-        key: ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem
-        port: 22
-        source: "~/Documents/projects/umrahdeals/server/*"
-        target: "/umrahdeals/server/"
+        ssh-private-key: ${{ secrets.UD_SSH_KEY }}
 
-    - name: Transfer frontend code to EC2
-      uses: appleboy/scp-action@master
-      with:
-        host: ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
-        username: ec2-user
-        key: ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem
-        port: 22
-        source: "~/Documents/projects/umrahdeals/client/*"
-        target: "/umrahdeals/client/"
+    - name: Copy backend files to EC2 instance
+      run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/server/ ec2-user@3.8.184.137:~/umrahdeals/
+
+    - name: Copy frontend files to EC2 instance
+      run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/client/ ec2-user@3.8.184.137:~/umrahdeals/
 
     - name: Login to Amazon ECR
       id: login-ecr
