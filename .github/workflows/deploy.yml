@@ -18,42 +18,51 @@ jobs:
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
-
-    - name: Set up SSH key
-      uses: webfactory/ssh-agent@v0.5.3
+    
+    - name: Test SSH connection
+      uses: appleboy/ssh-action@master
       with:
-        ssh-private-key: ${{ secrets.UD_SSH_KEY }}
+        host: 3.8.184.137
+        username: ec2-user
+        key: ${{ secrets.UD_SSH_KEY }}
+        port: 22
+        script: hostname
 
-    - name: Copy backend files to EC2 instance
-      run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/server/ ec2-user@3.8.184.137:~/umrahdeals/
+    # - name: Set up SSH key
+    #   uses: webfactory/ssh-agent@v0.5.3
+    #   with:
+    #     ssh-private-key: ${{ secrets.UD_SSH_KEY }}
 
-    - name: Copy frontend files to EC2 instance
-      run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/client/ ec2-user@3.8.184.137:~/umrahdeals/
+    # - name: Copy backend files to EC2 instance
+    #   run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/server/ ec2-user@3.8.184.137:~/umrahdeals/
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
+    # - name: Copy frontend files to EC2 instance
+    #   run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/client/ ec2-user@3.8.184.137:~/umrahdeals/
 
-    - name: Build and push Docker images to ECR
-      run: |
-        docker build -t 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend backend/
-        docker build -t 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-frontend frontend/
-        docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend
-        docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-frontend
+    # - name: Login to Amazon ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v2
 
-    # in terminal type 'echo $UD_SSH_KEY_PATH' to show path of UD ssh key 
-    - name: SSH into EC2 and deploy
-      run: |
-        ssh -i ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem ec2-user@3.8.184.137 << EOF
-          # Backend deployment commands
-          cd /path/to/backend
-          docker-compose down
-          docker-compose pull
-          docker-compose up -d
+    # - name: Build and push Docker images to ECR
+    #   run: |
+    #     docker build -t 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend backend/
+    #     docker build -t 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-frontend frontend/
+    #     docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend
+    #     docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-frontend
 
-          # Frontend deployment commands
-          cd /path/to/frontend
-          docker-compose down
-          docker-compose pull
-          docker-compose up -d
-        EOF
+    # # in terminal type 'echo $UD_SSH_KEY_PATH' to show path of UD ssh key 
+    # - name: SSH into EC2 and deploy
+    #   run: |
+    #     ssh -i ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem ec2-user@3.8.184.137 << EOF
+    #       # Backend deployment commands
+    #       cd /path/to/backend
+    #       docker-compose down
+    #       docker-compose pull
+    #       docker-compose up -d
+
+    #       # Frontend deployment commands
+    #       cd /path/to/frontend
+    #       docker-compose down
+    #       docker-compose pull
+    #       docker-compose up -d
+    #     EOF
