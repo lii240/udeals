@@ -19,6 +19,11 @@ jobs:
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
     
+    - name: Set up SSH key
+      uses: actions/checkout@v3
+      with:
+        private-key: ${{ secrets.UD_SSH_KEY }}
+
     - name: Test SSH connection
       uses: appleboy/ssh-action@master
       with:
