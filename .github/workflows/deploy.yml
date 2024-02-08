@@ -18,34 +18,27 @@ jobs:
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
-    
-    - name: Set up SSH key
-      uses: actions/checkout@v3
-      with:
-        private-key: ${{ secrets.UD_SSH_KEY }}
 
-    - name: Test SSH connection to EC2
+    - name: Install requests library
       run: |
-        #!/bin/bash
+        python -m pip install --upgrade pip
+        pip install requests
 
-        # Replace placeholders with your actual values
-        HOST=ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
-        USER=ec2-user
-        KEY_PATH=${{ secrets.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem
+    - name: Get Runner IP
+      run: |
+        curl -sS https://api.ipify.org > runner_ip.txt
+        echo "Runner IP: $(cat runner_ip.txt)"
 
-        # Attempt SSH connection
-        if ssh -i $KEY_PATH $USER@$HOST "echo SSH connection successful!" &> /dev/null; then
-          echo "SSH connection to $HOST successful!"
-        else
-          echo "SSH connection to $HOST failed!"
-          exit 1
-        fi
-
-
+    - name: Upload IP address file
+      uses: actions/upload-artifact@v2
+      with:
+        name: runner-ip
+        path: runner_ip.txt
+    
     # - name: Set up SSH key
-    #   uses: webfactory/ssh-agent@v0.5.3
+    #   uses: actions/checkout@v3
     #   with:
-    #     ssh-private-key: ${{ secrets.UD_SSH_KEY }}
+    #     private-key: ${{ secrets.UD_SSH_KEY }}
 
     # - name: Copy backend files to EC2 instance
     #   run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/server/ ec2-user@3.8.184.137:~/umrahdeals/
