@@ -19,6 +19,30 @@ jobs:
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
 
+    - name: Transfer backend code to EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
+        username: ec2-user
+        key: ${{ env.UD_SSH_KEY_PATH }}
+        port: 22
+        source: "backend/*"
+        target: "/umrahdeals/server/backend/"
+        recursive: true  # Transfers files recursively
+        verbose: true   # Shows transfer progress
+
+    - name: Transfer frontend code to EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
+        username: ec2-user
+        key: ${{ env.UD_SSH_KEY_PATH }}
+        port: 22
+        source: "frontend/*"
+        target: "/umrahdeals/client/frontend/"
+        recursive: true  # Transfers files recursively
+        verbose: true   # Shows transfer progress
+
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
@@ -30,6 +54,7 @@ jobs:
         docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend
         docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-frontend
 
+    # in terminal type 'echo $UD_SSH_KEY_PATH' to show path of UD ssh key 
     - name: SSH into EC2 and deploy
       run: |
         ssh -i ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem ec2-user@3.8.184.137 << EOF
