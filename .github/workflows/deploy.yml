@@ -19,9 +19,12 @@ jobs:
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
 
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
     - name: Build and push Docker images to ECR
       run: |
-        $(aws ecr get-login --no-include-email)
         docker build -t 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend backend/
         docker build -t 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-frontend frontend/
         docker push 672026569541.dkr.ecr.eu-west-2.amazonaws.com/umrahdeals-backend
@@ -30,7 +33,6 @@ jobs:
     - name: SSH into EC2 and deploy
       run: |
         ssh -i ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem ec2-user@3.8.184.137 << EOF
-          
           # Backend deployment commands
           cd /path/to/backend
           docker-compose down
