@@ -26,8 +26,8 @@ jobs:
         username: ec2-user
         key: ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem
         port: 22
-        source: "backend/*"
-        target: "/umrahdeals/server/backend/"
+        source: "~/Documents/projects/umrahdeals/server/*"
+        target: "/umrahdeals/server/"
 
     - name: Transfer frontend code to EC2
       uses: appleboy/scp-action@master
@@ -36,8 +36,8 @@ jobs:
         username: ec2-user
         key: ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem
         port: 22
-        source: "frontend/*"
-        target: "/umrahdeals/client/frontend/"
+        source: "~/Documents/projects/umrahdeals/client/*"
+        target: "/umrahdeals/client/"
 
     - name: Login to Amazon ECR
       id: login-ecr
