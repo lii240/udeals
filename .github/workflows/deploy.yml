@@ -24,7 +24,7 @@ jobs:
       with:
         host: ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
         username: ec2-user
-        key: ${{ env.UD_SSH_KEY_PATH }}
+        key: ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem
         port: 22
         source: "backend/*"
         target: "/umrahdeals/server/backend/"
@@ -36,7 +36,7 @@ jobs:
       with:
         host: ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
         username: ec2-user
-        key: ${{ env.UD_SSH_KEY_PATH }}
+        key: ${{ env.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem
         port: 22
         source: "frontend/*"
         target: "/umrahdeals/client/frontend/"
