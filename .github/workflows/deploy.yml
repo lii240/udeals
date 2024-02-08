@@ -24,14 +24,14 @@ jobs:
       with:
         private-key: ${{ secrets.UD_SSH_KEY }}
 
-    - name: Test SSH connection
-      uses: appleboy/ssh-action@master
+    - name: Test SSH connection to EC2
+      uses: nhost/nhost-deploy@v1
       with:
-        host: 3.8.184.137
+        hostname: ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
         username: ec2-user
         key: ${{ secrets.UD_SSH_KEY }}
-        port: 22
-        script: hostname
+        command: "echo SSH connection successful!"
+
 
     # - name: Set up SSH key
     #   uses: webfactory/ssh-agent@v0.5.3
