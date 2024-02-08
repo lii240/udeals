@@ -24,22 +24,9 @@ jobs:
       with:
         private-key: ${{ secrets.UD_SSH_KEY }}
 
-    - name: Test SSH connection to EC2
+    - name: Retrieve EC2 hostname
       run: |
-        #!/bin/bash
-
-        # Replace placeholders with your actual values
-        HOST=ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
-        USER=ec2-user
-        KEY_PATH=${{ secrets.UD_SSH_KEY_PATH }}/umrahdeals-kp.pem
-
-        # Attempt SSH connection
-        if ssh -i $KEY_PATH $USER@$HOST "echo SSH connection successful!" &> /dev/null; then
-          echo "SSH connection to $HOST successful!"
-        else
-          echo "SSH connection to $HOST failed!"
-          exit 1
-        fi
+        ssh -i ${{ secrets.UD_SSH_KEY }} ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
 
     # - name: Copy backend files to EC2 instance
     #   run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/server/ ec2-user@3.8.184.137:~/umrahdeals/
