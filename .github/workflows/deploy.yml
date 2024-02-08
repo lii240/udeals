@@ -19,18 +19,21 @@ jobs:
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
     
-    - name: Set up SSH key
-      uses: actions/checkout@v3
-      with:
-        private-key: ${{ secrets.UD_SSH_KEY }}
+    # - name: Set up SSH key
+    #   uses: actions/checkout@v3
+    #   with:
+    #     private-key: ${{ secrets.UD_SSH_KEY }}
 
-    - name: Adjust SSH key permissions
+    - name: Build & Deploy
+      env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       run: |
-        chmod 400 ${{ secrets.UD_SSH_KEY }}
+        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com '
 
-    - name: Retrieve EC2 hostname
-      run: |
-        ssh -i ${{ secrets.UD_SSH_KEY }} ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
+    # - name: Retrieve EC2 hostname
+    #   run: |
+    #     ssh -i ${{ secrets.UD_SSH_KEY }} ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
 
     # - name: Copy backend files to EC2 instance
     #   run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/server/ ec2-user@3.8.184.137:~/umrahdeals/
