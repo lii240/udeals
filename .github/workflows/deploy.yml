@@ -29,7 +29,7 @@ jobs:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
 
     # - name: Retrieve EC2 hostname
     #   run: |
