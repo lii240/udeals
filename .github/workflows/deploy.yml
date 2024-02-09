@@ -35,24 +35,18 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
-
-    - name: Copy file to EC2
-      run: |
-        scp -i /Users/liban/Documents/projects/umrahdeals/umrahdeals-kp.pem /Users/liban/Documents/projects/umrahdeals/README.md ec2-user@${{ steps.ip.outputs.ipv4 }}:~/
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.UD_SSH_KEY }}
     
     # - name: Set up SSH key
     #   uses: actions/checkout@v3
     #   with:
     #     private-key: ${{ secrets.UD_SSH_KEY }}
 
-    # - name: Build & Deploy
-    #   env:
-    #       PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-    #   run: |
-    #     echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-    #     ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
+    - name: Build & Deploy
+      env:
+          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
 
     # the above works but only if i open port 22 to the world on aws sec groups
     # need to find way of allowing github actions runner without opening to world
