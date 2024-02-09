@@ -35,11 +35,6 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
-    
-    # - name: Set up SSH key
-    #   uses: actions/checkout@v3
-    #   with:
-    #     private-key: ${{ secrets.UD_SSH_KEY }}
 
     - name: Build & Deploy
       env:
@@ -47,6 +42,15 @@ jobs:
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
         ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-18-134-209-171.eu-west-2.compute.amazonaws.com 'hostname'
+
+    - name: Remove Github Actions IP from security group
+      run: |
+        aws ec2 revoke-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
+      if: always()
 
     # the above works but only if i open port 22 to the world on aws sec groups
     # need to find way of allowing github actions runner without opening to world
