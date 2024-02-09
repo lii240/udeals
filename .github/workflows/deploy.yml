@@ -38,7 +38,7 @@ jobs:
 
     - name: Copy file to EC2
       run: |
-        scp -i /Users/lh/Documents/projects/umrahdeals/umrahdeals-kp.pem /Users/lh/Documents/projects/umrahdeals/README.md ec2-user@${{ steps.ip.outputs.ipv4 }}:~/
+        scp -i /Users/liban/Documents/projects/umrahdeals/umrahdeals-kp.pem /Users/liban/Documents/projects/umrahdeals/README.md ec2-user@${{ steps.ip.outputs.ipv4 }}:~/
       env:
         SSH_PRIVATE_KEY: ${{ secrets.UD_SSH_KEY }}
     
