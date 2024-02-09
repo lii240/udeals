@@ -19,7 +19,7 @@ jobs:
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
 
-    - name: Get Github action IP
+    - name: Get the IP of the github actions runner
       id: ip
       uses: haythem/public-ip@v1.2
 
@@ -28,7 +28,7 @@ jobs:
         echo "AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
         echo "AWS_SG_NAME=default" >> $GITHUB_ENV
 
-    - name: Add Github Actions IP to security group
+    - name: Add github actions IP to the EC2's security group
       run: |
         aws ec2 authorize-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32    
       env:
@@ -41,7 +41,8 @@ jobs:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-18-134-209-171.eu-west-2.compute.amazonaws.com 'hostname'
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-18-134-209-171.eu-west-2.compute.amazonaws.com 'hostname' && \
+        scp -o StrictHostKeyChecking=no -i private_key /Users/liban/Documents/projects/umrahdeals/README.md ec2-user@ec2-18-134-209-171.eu-west-2.compute.amazonaws.com:/home/ec2-user
 
     - name: Remove Github Actions IP from security group
       run: |
@@ -51,9 +52,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
       if: always()
-
-    # the above works but only if i open port 22 to the world on aws sec groups
-    # need to find way of allowing github actions runner without opening to world
 
     # - name: Copy backend files to EC2 instance
     #   run: scp -i ${{ secrets.UD_SSH_KEY }} -r -o StrictHostKeyChecking=no ~/Documents/projects/umrahdeals/server/ ec2-user@3.8.184.137:~/umrahdeals/
