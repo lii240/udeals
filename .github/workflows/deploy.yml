@@ -12,24 +12,51 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
+
     - name: Configure AWS credentials
       run: |
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
+
+    - name: Get Github action IP
+      id: ip
+      uses: haythem/public-ip@v1.2
+
+    - name: Setting region and security group environment variables
+      run: |
+        echo "AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }}" &gt;&gt; $GITHUB_ENV
+        echo "AWS_SG_NAME=default" &gt;&gt; $GITHUB_ENV
+
+    - name: Add Github Actions IP to security group
+      run: |
+        aws ec2 authorize-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32    
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
+
+    - name: Deploy to prod server
+      uses: appleboy/ssh-action@master
+      with:
+        host: 18.134.209.171
+        username: ec2-user
+        key: ${{ secrets.UD_SSH_KEY }}
+        script: |
+          cd /var/www/html/my-awesome-project
+          touch testino.txt
     
     # - name: Set up SSH key
     #   uses: actions/checkout@v3
     #   with:
     #     private-key: ${{ secrets.UD_SSH_KEY }}
 
-    - name: Build & Deploy
-      env:
-          PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-      run: |
-        echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
+    # - name: Build & Deploy
+    #   env:
+    #       PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+    #   run: |
+    #     echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+    #     ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
 
     # the above works but only if i open port 22 to the world on aws sec groups
     # need to find way of allowing github actions runner without opening to world
