@@ -46,7 +46,7 @@ jobs:
           PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-8-184-137.eu-west-2.compute.amazonaws.com 'hostname'
+        ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-18-134-209-171.eu-west-2.compute.amazonaws.com 'hostname'
 
     # the above works but only if i open port 22 to the world on aws sec groups
     # need to find way of allowing github actions runner without opening to world
