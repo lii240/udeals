@@ -36,15 +36,11 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_DEFAULT_REGION: ${{ env.AWS_DEFAULT_REGION }}
 
-    - name: Deploy to prod server
-      uses: appleboy/ssh-action@master
-      with:
-        host: 18.134.209.171
-        username: ec2-user
-        key: ${{ secrets.UD_SSH_KEY }}
-        script: |
-          cd /var/www/html/my-awesome-project
-          touch testino.txt
+    - name: Copy file to EC2
+      run: |
+        scp -i /Users/lh/Documents/projects/umrahdeals/umrahdeals-kp.pem /Users/lh/Documents/projects/umrahdeals/README.md ec2-user@${{ steps.ip.outputs.ipv4 }}:~/
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.UD_SSH_KEY }}
     
     # - name: Set up SSH key
     #   uses: actions/checkout@v3
