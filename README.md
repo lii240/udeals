@@ -1,6 +1,8 @@
 Simple way to get backend data (python flask) display on the frontend (next.js)
 
+-----------------
 Directory setup:
+-----------------`
 
 1. create a server directory for our backend
 2. create a virtual environment for our python dependencies
@@ -14,7 +16,9 @@ Directory setup:
     - import alias = no
     above are the chosen options for the particular project
 
+-----------
 Code:
+-----------`
 
 5. in the server directory create server.py - this is where our flask code will reside:
 
@@ -81,7 +85,9 @@ NOTE: below are the commands to run our local environments
 for flask   - python3 server.py
 for next.js - npm run dev
 
-Running the app in Docker containers:
+-----------------------------------------------
+Manually running the app in Docker containers:
+-----------------------------------------------`
 
 8. create a Dockerfile for both frontend & backend
 
@@ -142,6 +148,7 @@ the frontend and backend should then be running in localhost on their respective
 http://localhost:3000/
 http://127.0.0.1:5001/api/home
 
+
 Run the app in docker-compose
 
 9. in the project's root directory create a file called docker-compose.yml:
@@ -162,3 +169,34 @@ services:
     restart: always
 
 10. run the containers with this command - docker-compose up -d
+
+-------------------------------
+Automate the process via CICD:
+-------------------------------`
+
+11. choose which CICD platform to use, in this case we will go with Github Actions
+12. in the project root directory create the following - .github/workflow/deploy.yml
+13. assuming that we already have the infrastructure built (ec2, vpc, iam etc), the important steps of our pipeline are:
+
+    - setting up aws access keys for programmable access (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+    - ssh access to the ec2, this can be really confusing so follow steps x to achieve this
+    - we use github action runners to perform the various steps in our pipeline therefore on our ec2's security group we need to temporarily give the github actions runner access to ssh port 22
+
+getting the above 3 steps right will make our life way easier, see below to see how this is done
+
+-----------------
+AWS access keys:
+-----------------`
+
+14. in aws create a user and give it aws access and secret keys
+15. store those keys on your local machine using the 'aws configure' cli command, the keys will then be stored
+    in ~/.aws/credentials
+16. in your github repo go to settings > secrets and variables > actions > create a new repository secret for
+    the aws access key and aws secret key
+17. in github actions pipeline have this step in order for the runner to authenticate to our aws account
+
+    - name: Configure AWS credentials
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws configure set region ${{ secrets.AWS_DEFAULT_REGION }}
