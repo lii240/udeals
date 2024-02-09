@@ -42,7 +42,8 @@ jobs:
       run: |
         echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
         ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-18-134-209-171.eu-west-2.compute.amazonaws.com 'hostname' && \
-        pwd
+        pwd && \
+        ls
 
     - name: Remove Github Actions IP from security group
       run: |
